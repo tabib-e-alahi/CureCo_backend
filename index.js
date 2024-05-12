@@ -49,8 +49,7 @@ async function run() {
       res.send(result);
     });
 
-
-// ========================== product carts related api ===============================
+    // ========================== product carts related api ===============================
 
     app.get("/productCarts", async (req, res) => {
       const email = req.query.email;
@@ -59,12 +58,28 @@ async function run() {
       res.send(result);
     });
 
-
     app.post("/productCarts", async (req, res) => {
       const cartItem = req.body;
       console.log(cartItem);
-      const result = await cartCollection.insertOne(cartItem);
-      res.send(result);
+
+      /// Check if the item already exists in the cart
+      const existingItem = await cartCollection.findOne({
+        productId: cartItem.productId,
+      });
+
+      if (existingItem) {
+        // If the item exists, increment its quantity
+        const result = await cartCollection.updateOne(
+          { productId: cartItem.productId },
+          { $inc: { quantity: 1 } }
+        );
+      } else {
+        // If the item doesn't exist, add it to the cart with a quantity of 1
+        const newItem = { ...cartItem, quantity: 1 };
+        const result = await cartCollection.insertOne(newItem);
+      }
+
+      res.send({ message: "Item added to cart successfully." });
     });
 
     app.delete("/productCarts/:id", async (req, res) => {
