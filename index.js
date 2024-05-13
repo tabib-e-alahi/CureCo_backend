@@ -28,6 +28,7 @@ async function run() {
     // ====================================== Collection of mongDB =============================
     const productCollection = client.db("cureCoDB").collection("products");
     const cartCollection = client.db("cureCoDB").collection("productCarts");
+    const reviewCollection = client.db("cureCoDB").collection("reviews");
 
     // ================ products and product api ============================
     app.get("/products", async (req, res) => {
@@ -89,7 +90,15 @@ async function run() {
       res.send(result);
     });
 
-    // ============================== ===========================
+    // ==============================review related auth ===========================
+
+    app.post("/reviews", async (req, res) => {
+      const reviewDetails = req.body;
+      console.log(reviewDetails);
+      const result = await reviewCollection.insertOne(reviewDetails);
+
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
