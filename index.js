@@ -91,6 +91,19 @@ async function run() {
     });
 
     // ==============================review related auth ===========================
+    app.get("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = { productId: id };
+
+      // const options = {
+      //     // Include only the `title` and `imdb` fields in the returned document
+      //     projection: { title: 1, price: 1, service_id: 1, img: 1 },
+      // };
+
+      const result = await reviewCollection.find(query).toArray();
+      res.send(result);
+    });
 
     app.post("/reviews", async (req, res) => {
       const reviewDetails = req.body;
