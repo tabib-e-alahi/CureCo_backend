@@ -31,10 +31,15 @@ async function run() {
     const reviewCollection = client.db("cureCoDB").collection("reviews");
 
     // ================ products and product api ============================
-    app.get("/products", async (req, res) => {
-      const result = await productCollection.find().toArray();
-      res.send(result);
-    });
+   app.get("/products", async (req, res) => {
+    const page = req.query.page || 1;
+    const pageSize = 12;
+    const skip = (page - 1) * pageSize;
+
+    const products = await productCollection.find().skip(skip).limit(pageSize).toArray();
+    res.send(products);
+});
+
 
     app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
@@ -87,6 +92,11 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.delete("/productCarts", async (req, res) => {
+      const result = await cartCollection.deleteMany();
       res.send(result);
     });
 
